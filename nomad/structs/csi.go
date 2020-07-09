@@ -749,11 +749,11 @@ func (p *CSIPlugin) Copy() *CSIPlugin {
 }
 
 func (p *CSIPlugin) SafeForInsert() bool {
-	return p.safeCopy == true
-}
-
-func (p *CSIPlugin) ForInsert() {
+	if !p.safeCopy {
+		return false
+	}
 	p.safeCopy = false
+	return true
 }
 
 // Normalize populates derived fields needed in the API
