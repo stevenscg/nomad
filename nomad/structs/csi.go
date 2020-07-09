@@ -724,6 +724,7 @@ func NewCSIPlugin(id string, index uint64) *CSIPlugin {
 func (p *CSIPlugin) newStructs() {
 	p.Controllers = map[string]*CSIInfo{}
 	p.Nodes = map[string]*CSIInfo{}
+	p.safeCopy = true
 }
 
 func (p *CSIPlugin) Copy() *CSIPlugin {
