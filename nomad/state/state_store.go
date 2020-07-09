@@ -1055,8 +1055,8 @@ func upsertNodeCSIPlugins(txn *memdb.Txn, node *structs.Node, index uint64) erro
 
 		plug.ModifyIndex = index
 
-		// no need to check SafeForInsert here, copy/new is above
-		err = txn.Insert("csi_plugins", plug.ForInsert())
+		plug.SafeForInsert()
+		err = txn.Insert("csi_plugins", plug)
 		if err != nil {
 			return fmt.Errorf("csi_plugins insert error: %v", err)
 		}
@@ -1187,7 +1187,7 @@ func updateOrGCPlugin(index uint64, txn *memdb.Txn, plug *structs.CSIPlugin) err
 		if !plug.SafeForInsert() {
 			return fmt.Errorf("csi_plugins update error %s: shared object", plug.ID)
 		}
-		err := txn.Insert("csi_plugins", plug.ForInsert())
+		err := txn.Insert("csi_plugins", plug)
 		if err != nil {
 			return fmt.Errorf("csi_plugins update error %s: %v", plug.ID, err)
 		}
@@ -2368,7 +2368,8 @@ func (s *StateStore) UpsertCSIPlugin(index uint64, plug *structs.CSIPlugin) erro
 		plug.CreateIndex = existing.(*structs.CSIPlugin).CreateIndex
 	}
 
-	err = txn.Insert("csi_plugins", plug.ForInsert())
+	plug.SafeForInsert()
+	err = txn.Insert("csi_plugins", plug)
 	if err != nil {
 		return fmt.Errorf("csi_plugins insert error: %v", err)
 	}
@@ -5617,10 +5618,10 @@ func (r *StateRestore) ScalingPolicyRestore(scalingPolicy *structs.ScalingPolicy
 
 // CSIPluginRestore is used to restore a CSI plugin
 func (r *StateRestore) CSIPluginRestore(plugin *structs.CSIPlugin) error {
-	if !plug.SafeForInsert() {
+	if !plugin.SafeForInsert() {
 		return fmt.Errorf("csi_plugins insert failed: %s: shared object", plugin.ID)
 	}
-	if err := r.txn.Insert("csi_plugins", plugin.ForInsert()); err != nil {
+	if err := r.txn.Insert("csi_plugins", plugin); err != nil {
 		return fmt.Errorf("csi plugin insert failed: %v", err)
 	}
 	return nil
