@@ -219,7 +219,7 @@ func (t *TLSConfig) Copy() *TLSConfig {
 	return nt
 }
 
-func defaultHttpClient() *http.Client {
+func DefaultHttpClient() *http.Client {
 	httpClient := cleanhttp.DefaultClient()
 	transport := httpClient.Transport.(*http.Transport)
 	transport.TLSHandshakeTimeout = 10 * time.Second
@@ -415,7 +415,7 @@ func NewClient(config *Config) (*Client, error) {
 
 	httpClient := config.HttpClient
 	if httpClient == nil {
-		httpClient = defaultHttpClient()
+		httpClient = DefaultHttpClient()
 		if err := ConfigureTLS(httpClient, config.TLSConfig); err != nil {
 			return nil, err
 		}
